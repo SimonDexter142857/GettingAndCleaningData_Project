@@ -1,8 +1,36 @@
+# Data Sources
+
+The original data is read from the following files: 
+
+Feature descriptions: 'UCI HAR Dataset/features.txt'
+Activity descriptions: 'UCI HAR Dataset/activity_labels.txt'
+Actual variable values: 'UCI HAR Dataset/train/X_train.txt' and 'UCI HAR Dataset/test/X_test.txt'
+Subject ids: 'UCI HAR Dataset/train/subject_train.txt' and 'UCI HAR Dataset/test/subject_test.txt'
+Activity ids appropriate for the data: 'UCI HAR Dataset/train/y_train.txt' and 'UCI HAR Dataset/test/y_test.txt'
+
+
+
+# Transformations
+
+Training and testing data were merged in union-all (i.e. row-wise) fashion w.r.t. the file type, e.g. subject id training
+was merged with subject id testing in that order. Activity ids available in source data were translated to their 
+descriptions using the dictionary. Only the features of interest were extracted (i.e. those columns of the actual data 
+which correspond to mean and standard deviation of the features). meanFrequency was interepreted as qualifying for the pull. 
+
+The resultant dataset is named data.combined and is further summarized into a tidy dataset mt (long format) which is aggregated 
+into data.summarized by computing the mean values of every variable with respect to subject id and activity description (NA values (if any) 
+are not taken into account). 
+
+
+
+
+# Variable Names and Descriptions of the Final Tidy Dataset
+
 SubjectId: integral value taken from 'subject_train.txt' and 'subject_test.txt' files
 
 ActivityDescr: WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING
 
-Variable: one of the following values (note, 'meanFreq' is interpreted as mean value)
+Variable: one of the following values (note, 'meanFreq' is taken to be mean value)
 
 tBodyAcc-mean()-X
 tBodyAcc-mean()-Y
@@ -84,7 +112,7 @@ fBodyBodyAccJerkMag-std()
 fBodyBodyGyroMag-std()
 fBodyBodyGyroJerkMag-std()
 
-Average: average value of the variables listed above with respect to subject id and activity
+Average: arithmetic mean value of the variables listed above w.r.t. subject id and activity description
 
 
 
