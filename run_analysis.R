@@ -3,6 +3,7 @@
 # Date:   10/12/14
 #
 #         ; 10/25/14: adding additional comments
+#         ; 11/09/14: validation
 #
 # Descr: source code for class project
 #
@@ -18,7 +19,7 @@
 require(reshape2);
 require(dplyr);
 # making R show extra digits (to account for the full significand)
-options(digits=10);
+options(digits=15);
 
 # reading the features dictionary 
 # may need to change path separator depending on the system (i.e. Windows-based / UNIX-based)
@@ -72,7 +73,7 @@ x.all=rbind(x.tr, x.ts);
 # assigning feature column names to the combined dataset
 colnames(x.all) = features$FeatureDescr;
 # removing extaneous objects from workspace 
-rm(list=c('x.tr','x.ts'));
+# rm(list=c('x.tr','x.ts'));
 
 # reading the training and testing subject list
 s.tr = read.table(
@@ -93,7 +94,7 @@ s.ts = read.table(
 );
 # combining in union-all fashion
 s.all = rbind(s.tr, s.ts);
-rm(list = c('s.tr','s.ts'));
+# rm(list = c('s.tr','s.ts'));
 
 colnames(s.all) = c('SubjectId');
 
@@ -119,9 +120,13 @@ y.all = rbind(y.tr, y.ts);
 # assigning valid column name
 colnames(y.all) = c('ActivityId');
 # removing extaneous objects from workspace 
-rm(list=c('y.tr','y.ts'));
+# rm(list=c('y.tr','y.ts'));
 # inner-joining activity label dictionary for translation
-y.all.lab = merge(y.all, al, by='ActivityId');
+
+
+al = tbl_df(al);
+
+
 
 
 # selecting only the features of interest, check.names option is for R
@@ -130,28 +135,50 @@ x.all.d = data.frame( x.all[, f], check.names=F );
 
 
 # step 4: creating combined dataset
-data.combined = data.frame(SubjectId = s.all$SubjectId, ActivityDescr = y.all.lab$ActivityDescr,  x.all.d, check.names=F);
+data.combined = tbl_df ( data.frame(SubjectId = s.all$SubjectId, ActivityId = y.all,  x.all.d, check.names=F) ); 
+
+data.combined = inner_join (data.combined, al, by='ActivityId' );
+
 
 # removing extraneous datasets
-rm(list=c('s.all', 'y.all.lab', 'x.all.d', 'x.all', 'y.all', 'features', 'al', 'f' ));
+# rm(list=c('s.all', 'y.all.lab', 'x.all.d', 'x.all', 'y.all', 'features', 'al', 'f' ));
 
 # making a tidy dataset 
-m = melt(data.combined,id=c('SubjectId', 'ActivityDescr'), na.rm=T );
+m = melt(data.combined,id=c('SubjectId', 'ActivityDescr', 'ActivityId'), na.rm=T );
 # assigning better-looking column names for consistency
-colnames(m)[3:4] = c('Variable', 'Value');
+colnames(m)[4:5] = c('Variable', 'Value');
 # preparing for dplyr operations
 mt = tbl_df(m);
 
 
-# producing final aggregated output
+# producing aggregated output in long format
 data.summarized = {
 	mt %>% 
-	group_by (SubjectId, ActivityDescr, Variable ) %>% 
+	group_by (SubjectId, ActivityDescr, ActivityId, Variable ) %>% 
 	summarize(Average = mean(Value, na.rm=T))
 }
 # recording into output file
-write.table(data.summarized, 'output.txt', row.name=F,sep='\t', quote=F);
 
-rm('m');
+# rm('m');
+
+# producting crosstabulated version of it (could be done in many ways) 
+
+data.summarized.xtab = dcast(
+    data.summarized, 
+    
+    SubjectId + ActivityId + ActivityDescr ~ Variable);
+
+write.table(data.summarized.xtab, 'output.csv', row.name=F,sep=',', quote=F);
+
+
+
+
+
+
+
+
+
+
+
 
 
