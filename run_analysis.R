@@ -4,6 +4,7 @@
 #
 #         ; 10/25/14: adding additional comments
 #         ; 11/09/14: validation
+#         ; 11/23/14: more validation
 #
 # Descr: source code for class project
 #
@@ -68,12 +69,12 @@ x.ts = read.table(
 );
 
 # combining train and test datasets in union-all fashion
-x.all=rbind(x.tr, x.ts);
+x.all = rbind(x.tr, x.ts);
 
 # assigning feature column names to the combined dataset
 colnames(x.all) = features$FeatureDescr;
 # removing extaneous objects from workspace 
-# rm(list=c('x.tr','x.ts'));
+rm(list=c('x.tr','x.ts'));
 
 # reading the training and testing subject list
 s.tr = read.table(
@@ -94,7 +95,7 @@ s.ts = read.table(
 );
 # combining in union-all fashion
 s.all = rbind(s.tr, s.ts);
-# rm(list = c('s.tr','s.ts'));
+rm(list = c('s.tr','s.ts'));
 
 colnames(s.all) = c('SubjectId');
 
@@ -120,7 +121,7 @@ y.all = rbind(y.tr, y.ts);
 # assigning valid column name
 colnames(y.all) = c('ActivityId');
 # removing extaneous objects from workspace 
-# rm(list=c('y.tr','y.ts'));
+rm(list=c('y.tr','y.ts'));
 # inner-joining activity label dictionary for translation
 
 
@@ -141,7 +142,7 @@ data.combined = inner_join (data.combined, al, by='ActivityId' );
 
 
 # removing extraneous datasets
-# rm(list=c('s.all', 'y.all.lab', 'x.all.d', 'x.all', 'y.all', 'features', 'al', 'f' ));
+rm(list=c('s.all',  'x.all.d', 'x.all', 'y.all', 'features', 'al', 'f' ));
 
 # making a tidy dataset 
 m = melt(data.combined,id=c('SubjectId', 'ActivityDescr', 'ActivityId'), na.rm=T );
@@ -159,7 +160,7 @@ data.summarized = {
 }
 # recording into output file
 
-# rm('m');
+rm('m');
 
 # producting crosstabulated version of it (could be done in many ways) 
 
@@ -168,7 +169,7 @@ data.summarized.xtab = dcast(
     
     SubjectId + ActivityId + ActivityDescr ~ Variable);
 
-write.table(data.summarized.xtab, 'output.csv', row.name=F,sep=',', quote=F);
+write.table(data.summarized.xtab, 'output.txt', row.name=F,sep=',', quote=F);
 
 
 

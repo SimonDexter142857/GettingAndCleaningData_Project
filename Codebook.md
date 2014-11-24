@@ -15,12 +15,11 @@ Activity ids appropriate for the data: 'UCI HAR Dataset/train/y_train.txt' and '
 Training and testing data were merged in union-all (i.e. row-wise) fashion w.r.t. the file type, e.g. subject id training
 was merged with subject id testing in that order. Activity ids available in source data were translated to their 
 descriptions using the dictionary. Only the features of interest were extracted (i.e. those columns of the actual data 
-which correspond to mean and standard deviation of the features). meanFrequency was interepreted as qualifying for the pull. 
+which correspond to mean and standard deviation of the features). meanFrequency was interpreted as qualifying for the pull. 
 
 The resultant dataset is named data.combined and is further summarized into a tidy dataset mt (long format) which is aggregated 
 into data.summarized by computing the mean values of every variable with respect to subject id and activity description (NA values (if any) 
-are not taken into account). 
-
+are not taken into account). Finally, data.summarized is further crosstabulated with respect to subject id, activity id and activity label so that each variable is in its own individual column. This way, both definitions of tidy dataset are satisfied.
 
 
 
